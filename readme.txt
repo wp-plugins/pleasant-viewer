@@ -6,11 +6,13 @@ Requires at least: 3.5
 Tested up to: 3.5.1
 Stable tag: 1.0
 
-Easily share Wednesday Readings, inspiring texts, lessons, benedictions and more on your WordPress site. Official site: [PleasantViewer.org](http://pleasantviewer.org).
+Easily share Wednesday Readings, inspiring texts, lessons, benedictions and more on your WordPress site. Official site: PleasantViewer.org
 
 == Description ==
 
 Provides the ability to enter Bible and Science and Health citations and publish and share the referenced text.  Uses [cskit-rb](https://github.com/camertron/cskit-rb) written by Cameron.  We built this plugin as part of the "Hack Your Church" hackathon at the U.C. Berkeley CSO.  Participants / contributors include Gabriel, Julian, Cameron and James.
+
+Demonstration site here: [PleasantViewer.org](http://pleasantviewer.org)
 
 Allows zero-signup (anonymous) posting of citations.
 
