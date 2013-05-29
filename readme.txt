@@ -10,7 +10,7 @@ Easily share Wednesday Readings, inspiring texts, lessons, benedictions and more
 
 == Description ==
 
-Provides the ability to enter Bible and Science and Health citations and publish and share the referenced text.
+Provides the ability to enter Bible and Science and Health citations and publish and share the referenced text.  Uses [cskit-rb](https://github.com/camertron/cskit-rb) written by Cameron.  We built this plugin as part of the "Hack Your Church" hackathon at the U.C. Berkeley CSO.  Participants / contributors include Gabriel, Julian, Cameron and James.
 
 = Shortcodes: =
 
@@ -32,6 +32,8 @@ Insert `[pleasantviewer]` on a page to display a form to add citations.  Note th
 Insert `[pleasantviewer]` on a page to display a form to add citations.  Note that this will enable anonymous publishing of citations to your site.
 
 == Frequently Asked Questions ==
+
+= Is Support Available? =
 
 Yes, use the contact form on the ShareThePractice.org [website](http://sharethepractice.org/contact/).
 
