@@ -6,7 +6,7 @@ Requires at least: 3.5
 Tested up to: 3.5.1
 Stable tag: 1.0
 
-Easily share Wednesday Readings, inspiring texts, lessons, benedictions and more!
+Easily share Wednesday Readings, inspiring texts, lessons, benedictions and more on your own WordPress site.  Check it out in action here: [PleasantViewer.org](http://pleasantviewer.org).  Allows zero-signup (anonymous) posting of citations.
 
 == Description ==
 
