@@ -350,7 +350,18 @@ function pleasant_viewer_styles() {
 	<?php
 }
 
+
+function pleasant_viewer_js() {
+	?>
+
+<script type="text/javascript" src="http://jscs.github.io/pleasant-script/index.js" />
+
+	<?php
+}
+
 add_filter( 'the_content', 'pleasant_viewer_the_content_footer' );
 add_action( 'wp_head', 'pleasant_viewer_styles');
+add_action( 'wp_head', 'pleasant_viewer_js');
+
 
 ?>
