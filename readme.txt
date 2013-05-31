@@ -1,5 +1,5 @@
 === Pleasant Viewer ===
-Contributors: gserafini
+Contributors: gserafini jscs
 Donate link: http://bit.ly/cs-bible-lesson-plugin-donation
 Tags: bible, lesson, viewer, citations, science-and-health, christian-science
 Requires at least: 3.5
