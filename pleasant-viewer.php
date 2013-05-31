@@ -46,17 +46,6 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 // 		$atts
 // 	));
 
-
-	// Set some functions
-	$message = array();
-
-	//Build the form
-	$whq_form .= '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post" enctype="multipart/form-data">';
-
-	$whq_form .= '<p><strong>Topic</strong> (Optional)<br /><input type="text" name="post_topic" size="75" value="' . strip_tags(stripslashes($_POST['post_topic'])) . '" /></p>';
-
-	$whq_form .= '<p><strong>Introduction / Description</strong> (Optional)<br /><textarea name="post_introduction" rows="4" cols="80">' . strip_tags(stripslashes($_POST['post_introduction'])) . '</textarea></p>';
-
 	$categories = get_categories(array('hide_empty'=>0));
 	$category_options = "";
 	foreach ($categories as $category) {
@@ -77,14 +66,39 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 
 	}
 
-	$whq_form .= '<p><strong>Category:</strong><br /><select name="post_category_id">' . $category_options . '</select></p>';
+	// Set some functions
+	$message = array();
 
+	//Build the form
+	
+	ob_start();
+	include('template_entry_form.php');
+	$whq_form = ob_get_clean(); 
 
-	$whq_form .= '<p><strong>Citations</strong><span style="color: #f00;">*</span> - Put each citation on its own line.<br />Currently supported books: KJV Bible passages (eg Gen 1:1) and <em>Science &amp; Health</em> references (eg 1:1)<br /><textarea name="post_citations" rows="12" cols="80">' . strip_tags(stripslashes($_POST['post_citations'])) . '</textarea></p>';
-
-	$whq_form .= '<p><input type="submit" name="submit" value="Submit" /></p>';
-
-	$whq_form .= '</form>';
+	// 
+// 	$whq_form .= '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post" enctype="multipart/form-data">';
+// 
+// 	$whq_form .= '<div><strong>Topic</strong> (Optional)<br /><input type="text" name="post_topic" size="60" value="' . strip_tags(stripslashes($_POST['post_topic'])) . '" /></div>';
+// 
+// 	$whq_form .= '<div><strong>Introduction / Description</strong> (Optional)<br /><textarea name="post_introduction" rows="3" cols="80">' . strip_tags(stripslashes($_POST['post_introduction'])) . '</textarea></div>';
+// 
+// 
+// 	$whq_form .= '<div><strong>Category:</strong><br /><select name="post_category_id">' . $category_options . '</select></div>';
+// 
+// 
+// 	$whq_form .= '<div>Put each citation on its own line.<br />Currently supported books: KJV Bible passages (eg Gen 1:1) and <em>Science &amp; Health</em> references (eg 1:1)</div>';
+// 
+// 	$whq_form .= '<div>';
+// 	
+// 	$whq_form .= '<div style="width: 30%; float: left;"><strong>Citations</strong><span style="color: #f00;">*</span><br /><textarea name="post_citations" rows="16" cols="20">' . strip_tags(stripslashes($_POST['post_citations'])) . '</textarea></div>';
+// 	
+// 	$whq_form .= '<div style="width: 55%; float: left;"><strong>Preview</strong><div style="border: 1px solid #ddd; width: 500px; height: 600px;"></div></div>';
+// 
+// 	$whq_form .= '<div>';
+// 
+// 	$whq_form .= '<div style="clear: both;"><input type="submit" name="submit" value="Submit" /></div>';
+// 
+// 	$whq_form .= '</form>';
 
 
 	if( isset($_POST['submit']) ) {
