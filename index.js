@@ -46,7 +46,7 @@ $j(function(){
       //console.log($j(xc).val());
       //console.log($j('#citations').val().split('\n')[i]);
       var new_input = $j('#citations').val().split('\n')[i];
-
+      var cn = i + 1;
       if($j('#sortable > dl > input')[i]){
         xcvalue = $j('#sortable > dl > input')[i].value;
       } else {
@@ -55,12 +55,16 @@ $j(function(){
       
       if (xcvalue != input_lines[i]) {
 	if (input_lines[i].length == 0) {
-	  if($j('#sortable > dl > input')[i]){$j('#sortable > dl > input')[i].parent().remove();}
+	  if($j('#sortable > dl')[i]){
+	    el = $j('#sortable > dl > dt')[i];
+	    $j(el).text('Citation #'+cn);
+	    el = $j('#sortable > dl > dd')[i];
+	    $j(el).text('Please type eg 4:4 or Gen 1:1...');
+	  }
 	}
 	console.log('xcvalue: ' + xcvalue);
 	console.log('xcvaluelength: ' + xcvalue.length);
-	if (xcvalue == 'na') {
-	  cn = i + 1;
+	if (xcvalue == 'na') {	  
 	  $j('#sortable').append('<dl id="x'+i+'"><input type="hidden" id="xc'+i+'" class="xc" value="' + input_lines[i] + '">      	  <dt id="citation_citation_'+i+'">Citation #'+cn+'</dt>	  <dd id="citation_text_'+i+'">Please type eg 4:4 or Gen 1:1...</dd> </dl>');      
 	}
 	//console.log("unequal");
