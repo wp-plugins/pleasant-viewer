@@ -29,14 +29,12 @@ $j(function(){
   function current_line(){
     return $j('#citations').val().substr(0, $j('#citations')[0].selectionStart).split("\n").length - 1;
   }
+  
   function scroll_preview(){    
     $j('#sortable').scrollTop($j('#sortable').scrollTop() + ($j('#x' + current_line()).position().top - $j('#sortable').position().top) - ($j('#sortable').height()/2) + ($j('#x' + current_line()).height()/2) );
   }
   
   function update_preview(){
-    //if ($j('#x' + current_line()).length == 0) {        
-      //	$j('#sortable').append('<dl id="x'+current_line()+'"><input type="hidden" id="xc'+current_line()+'" class="xc">      	  <dt id="citation_citation_'+current_line()+'">Citation #'+current_line()+'</dt>	  <dd id="citation_text_'+current_line()+'">Please type eg 4:4 or Gen 1:1...</dd> </dl>');      
-    //}    
     $j('#sortable > dl').each(function () {this.style.cssText = 'color: black;'});
     
     input_lines = $j('#citations').val().split('\n');
@@ -57,15 +55,17 @@ $j(function(){
 	if (input_lines[i].length == 0) {
 	  if($j('#sortable > dl')[i]){
 	    el = $j('#sortable > dl > dt')[i];
-	    $j(el).text('Citation #'+cn);
+	    //$j(el).text('Citation #'+cn);
+	    $j(el).append('<hr />');
 	    el = $j('#sortable > dl > dd')[i];
-	    $j(el).text('Please type eg 4:4 or Gen 1:1...');
+	    //$j(el).text('Please type eg 4:4 or Gen 1:1...');
+	    $j(el).text('');
 	  }
 	}
 	console.log('xcvalue: ' + xcvalue);
 	console.log('xcvaluelength: ' + xcvalue.length);
 	if (xcvalue == 'na') {	  
-	  $j('#sortable').append('<dl id="x'+i+'"><input type="hidden" id="xc'+i+'" class="xc" value="' + input_lines[i] + '">      	  <dt id="citation_citation_'+i+'">Citation #'+cn+'</dt>	  <dd id="citation_text_'+i+'">Please type eg 4:4 or Gen 1:1...</dd> </dl>');      
+	  $j('#sortable').append('<dl id="x'+i+'"><input type="hidden" id="xc'+i+'" class="xc" value="' + input_lines[i] + '"><dt id="citation_citation_'+i+'"><hr /></dt><dd id="citation_text_'+i+'"></dd> </dl>');      
 	}
 	//console.log("unequal");
 	

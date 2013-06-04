@@ -188,6 +188,19 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 				'br' => array(),
 				'em' => array(),
 				'strong' => array(),
+				'hr' => array(),
+				'span' => array(
+					'style' => array(),
+					'class' => array(),
+					'id' => array()),
+				'div' => array(
+					'style' => array(),
+					'class' => array(),
+					'id' => array()),
+				'p' => array(
+					'style' => array(),
+					'class' => array(),
+					'id' => array()),
 				'dl' => array(
 					'id' => array(),
 					'class' => array()),
@@ -200,9 +213,13 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 				);
 
 			$formatted_post_body = "";
-			$formatted_post_body .= strip_tags(stripslashes($_POST['post_introduction'])) . "\n";
+			$formatted_post_body .= '<div class="pleasant-viewer-post-introduction">' . "\n";
+			$formatted_post_body .= wp_kses($_POST['post_introduction'], $allowed_html) . "\n";
+			$formatted_post_body .= '</div>' . "\n";
+			$formatted_post_body .= '<div class="pleasant-viewer-citations-formatted">' . "\n";
 			$formatted_post_body .= wp_kses($citations_formatted, $allowed_html);
-			$formatted_post_body .= '<div class="pleasantviewer_citations_list" style="border: 1px solid #eee;">' . "\n";
+			$formatted_post_body .= '</div>' . "\n";
+			$formatted_post_body .= '<div class="pleasant-viewer-citations-list">' . "\n";
 			$formatted_post_body .= wp_kses($citation_list_raw, $allowed_html) . "\n";
 			$formatted_post_body .= '</div>';
 
@@ -341,6 +358,7 @@ function pleasant_viewer_styles() {
 	?>
 
 <style type="text/css">
+
 .pleasant-viewer-permalink {
 	margin: 12px 0;
 	}
@@ -349,9 +367,12 @@ function pleasant_viewer_styles() {
 	background: #fdfac4;
 	padding: 6px;
 	}
-// div {background-color: red; margin: 5px;}
-	
-	
+
+.pleasant-viewer-citations-list {
+	border: 1px solid #eee;
+	padding: 6px;
+	}
+
 </style>
 
 <!--<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>-->
