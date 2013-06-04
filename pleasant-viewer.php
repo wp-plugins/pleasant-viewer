@@ -75,32 +75,6 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 	include('template_entry_form.php');
 	$whq_form = ob_get_clean(); 
 
-	// 
-// 	$whq_form .= '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post" enctype="multipart/form-data">';
-// 
-// 	$whq_form .= '<div><strong>Topic</strong> (Optional)<br /><input type="text" name="post_topic" size="60" value="' . strip_tags(stripslashes($_POST['post_topic'])) . '" /></div>';
-// 
-// 	$whq_form .= '<div><strong>Introduction / Description</strong> (Optional)<br /><textarea name="post_introduction" rows="3" cols="80">' . strip_tags(stripslashes($_POST['post_introduction'])) . '</textarea></div>';
-// 
-// 
-// 	$whq_form .= '<div><strong>Category:</strong><br /><select name="post_category_id">' . $category_options . '</select></div>';
-// 
-// 
-// 	$whq_form .= '<div>Put each citation on its own line.<br />Currently supported books: KJV Bible passages (eg Gen 1:1) and <em>Science &amp; Health</em> references (eg 1:1)</div>';
-// 
-// 	$whq_form .= '<div>';
-// 	
-// 	$whq_form .= '<div style="width: 30%; float: left;"><strong>Citations</strong><span style="color: #f00;">*</span><br /><textarea name="post_citations" rows="16" cols="20">' . strip_tags(stripslashes($_POST['post_citations'])) . '</textarea></div>';
-// 	
-// 	$whq_form .= '<div style="width: 55%; float: left;"><strong>Preview</strong><div style="border: 1px solid #ddd; width: 500px; height: 600px;"></div></div>';
-// 
-// 	$whq_form .= '<div>';
-// 
-// 	$whq_form .= '<div style="clear: both;"><input type="submit" name="submit" value="Submit" /></div>';
-// 
-// 	$whq_form .= '</form>';
-
-
 	if( isset($_POST['submit']) ) {
 
 		// Set the required fields
@@ -130,76 +104,106 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 			return $whq_form;
 
 		} else {
+		
+			if ($_POST['rendered_citations'] == "") {
 
-			$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
-			$citation_list_array = explode ("\n", $citation_list_raw);
+				// We didn't get text in form, supplied by Javascript.  Use built-in PHP library
+				// to call to the API
 
-			$post_category = strip_tags(stripslashes($_POST['post_category_id']));
+				$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
+				$citation_list_array = explode ("\n", $citation_list_raw);
 
-			// jSON URL which should be requested
-			// TODO: Move this to Options page!
-			$json_url = 'http://cskit-server.herokuapp.com/v1/text.json';
+				$post_category = strip_tags(stripslashes($_POST['post_category_id']));
 
-			$citation_list_retrieved = array();
-			$citations_formatted = "";
-			$readings = "";
+				// jSON URL which should be requested
+				$json_url = 'http://cskit-server.herokuapp.com/v1/text.json';
 
-			foreach ($citation_list_array as $citation) {
+				$citation_list_retrieved = array();
+				$citations_formatted = "";
+				$readings = "";
 
-				if ($citation != "") {
+				foreach ($citation_list_array as $citation) {
 
-					$volume = 'bible_kjv';
-					if (is_numeric(substr($citation, 0, 1))) {
-						$volume = 'science_health';
+					if ($citation != "") {
+
+						$volume = 'bible_kjv';
+						if (is_numeric(substr($citation, 0, 1))) {
+							$volume = 'science_health';
+						}
+
+						$readings .= $volume . " " . $citation . "|";
+
 					}
+				}
 
-					$readings .= $volume . " " . $citation . "|";
+				$json_string = 'citations='. urlencode($readings) . '&format=plain_text';
+				$curlopt_url = $json_url . '?' .  $json_string;
+				$theBody = wp_remote_retrieve_body( wp_remote_get($curlopt_url) );
+				$body = json_decode($theBody, true);
+
+				foreach ($body as $citation) {
+
+					$citation_list_retrieved[] = array(
+
+						'citation' => $citation["citation"],
+						'volume' => $volume,
+						'text' => $citation["text"],
+						'api_url' => $curlopt_url
+		
+						);
 
 				}
-			}
 
-			$json_string = 'format=plain_text&amp;citations='.urlencode($readings) . '';
-			
-			$curlopt_url = $json_url . '?' . $json_string;
-			
-			$theBody = wp_remote_retrieve_body( wp_remote_get($curlopt_url) );
+				$have_citation_text = false;
 
-			$body = json_decode($theBody, true);
-
-			foreach ($body as $citation) {
-
-				$citation_list_retrieved[] = array(
-
-					'citation' => $citation["citation"],
-					'volume' => $volume,
-					'text' => $citation["text"],
-					'api_url' => $curlopt_url
-			
-					);
-			}
-
-			$have_citation_text = false;
-
-			foreach ($citation_list_retrieved as $passage) {
-				if ($passage['text'] != "") {
-					$citations_formatted .= '<p>';
-					$citations_formatted .= '<strong>';
-					if ($passage['volume'] == 'science_health') {
-						$citations_formatted .= 'SH ';
+				foreach ($citation_list_retrieved as $passage) {
+					if ($passage['text'] != "") {
+						$citations_formatted .= '<dl>';
+						$citations_formatted .= '<dt>';
+						if ($passage['volume'] == 'science_health') {
+							$citations_formatted .= 'SH ';
+						}
+						$citations_formatted .= $passage['citation'] . '</dt>';
+						$citations_formatted .= '<dd>';
+						$citations_formatted .= nl2br($passage['text']);
+						//$citations_formatted .= "<br />" . $passage['api_url'];
+						$citations_formatted .= '</dd></dl>' . "\n\n";
+						$have_citation_text = true;
 					}
-					$citations_formatted .= $passage['citation'] . '</strong><br />';
-					$citations_formatted .= nl2br($passage['text']);
-					//$citations_formatted .= "<br />" . $passage['api_url'];
-					$citations_formatted .= '</p>' . "\n\n";
-					$have_citation_text = true;
 				}
+
 			}
+			else {
+				// Javascript library provided rendered text, don't need to call API via PHP
+				$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
+				$citations_formatted = $_POST['rendered_citations'];
+				$have_citation_text = true;				
+			}
+
+			$allowed_html = array(
+				'a' => array(
+					'href' => array(),
+					'title' => array()
+				),
+				'br' => array(),
+				'em' => array(),
+				'strong' => array(),
+				'dl' => array(
+					'id' => array(),
+					'class' => array()),
+				'dt' => array(
+					'id' => array(),
+					'class' => array()),
+				'dd' => array(
+					'id' => array(),
+					'class' => array()),
+				);
 
 			$formatted_post_body = "";
 			$formatted_post_body .= strip_tags(stripslashes($_POST['post_introduction'])) . "\n";
-			$formatted_post_body .= $citations_formatted;
+			$formatted_post_body .= wp_kses($citations_formatted, $allowed_html);
 			$formatted_post_body .= '<div class="pleasantviewer_citations_list" style="border: 1px solid #eee;">' . "\n";
-			$formatted_post_body .= $citation_list_raw . "\n";
+			$formatted_post_body .= wp_kses($citation_list_raw, $allowed_html) . "\n";
 			$formatted_post_body .= '</div>';
 
 			$options = get_option('pleasant_viewer_plugin_options');
@@ -349,11 +353,10 @@ function pleasant_viewer_styles() {
 	
 	
 </style>
- <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>  
+
+<!--<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>-->
+<!--<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>-->
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-  
 
 	<?php
 }
@@ -361,9 +364,7 @@ function pleasant_viewer_styles() {
 
 function pleasant_viewer_js() {
 
-
-wp_enqueue_script('the_js', plugins_url('/index.js',__FILE__) );
-
+	wp_enqueue_script('the_js', plugins_url('/index.js',__FILE__) );
 
 }
 

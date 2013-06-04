@@ -84,12 +84,14 @@ $j(function(){
       i++;
       
     });
-    $j('#x' + current_line()).attr('style','color: blue;');    
-    scroll_preview();    
+    $j('#x' + current_line()).attr('style','color: black;');
+    //alert($j('#sortable').html());
+	$j('#rendered_citations').val($j('#sortable').html());
+    scroll_preview();
   }
   
   function reload_citation(cl){
-    $j('#tooltip').text("Busy, keep typing..");    
+    $j('#tooltip').text("Looking up citations...");    
     //console.log(current_line());        
     cit = $j('#citations').val().split('\n')[cl];
       if (!isNaN(cit.charAt(0))) {
@@ -107,7 +109,7 @@ $j(function(){
       }
       $j('#citation_citation_'+cl).text(citation.citation);
       $j('#citation_text_'+cl).text(citation.text);        
-      $j('#tooltip').text("Done, hit enter for the next one..");
+      $j('#tooltip').text("Done, hit enter for the next one...");
       scroll_preview();
     });
     
@@ -121,15 +123,15 @@ $j(function(){
     if ($j("#name").val() == 'New Inspiration' ) {$j(this).select();}
   });
   $j("#description").click(function(){
-    if ($j('#description').val() == 'This is a little introduction on my citations..') {$j(this).select();}
+    if ($j('#description').val() == 'Add an introduction or description for these citations...') {$j(this).select();}
   });
   
   
   
   update_preview();
   //console.log('just loaded citations');
-  $j('#masthead').remove();
-  $j('header').remove();
+  //$j('#masthead').remove();
+  //$j('header').remove();
   //$j('#page').html($j('#takeover').html());
   
   
@@ -140,7 +142,7 @@ $j( document ).ready(function() {
     $j('#name').val('New Inspiration');
   }
   if ($j('#description').val().length == 0) {
-    $j('#description').val('This is a little introduction on my citations..');
+    $j('#description').val('Add an introduction or description for these citations...');
   }
   update_preview();
 });
