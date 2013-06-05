@@ -378,10 +378,7 @@ function pleasant_viewer_styles() {
 <!--<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>-->
 <!--<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>-->
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<<<<<<< .mine
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-=======
->>>>>>> .r723246
 
 	<?php
 }
