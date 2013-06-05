@@ -29,6 +29,18 @@ $j(function(){
   function current_line(){
     return $j('#citations').val().substr(0, $j('#citations')[0].selectionStart).split("\n").length - 1;
   }
+  function format_citation(ct) {    
+      var re = new RegExp(/_.[^_]+_/g);
+      
+      ct = ct.replace(/\n/g," <br>");
+      
+      while(m=re.exec(ct)) {
+        k = m[0].replace(/_/g,"");
+	k = "<i>" + k + "</i>";
+	ct = ct.replace(m[0],k);	
+      }
+    return ct
+  }
   
   function scroll_preview(){    
     $j('#sortable').scrollTop($j('#sortable').scrollTop() + ($j('#x' + current_line()).position().top - $j('#sortable').position().top) - ($j('#sortable').height()/2) + ($j('#x' + current_line()).height()/2) );
@@ -109,7 +121,8 @@ $j(function(){
 	citation.citation = 'S&H ' + citation.citation
       }
       $j('#citation_citation_'+cl).text(citation.citation);
-      $j('#citation_text_'+cl).text(citation.text);        
+      formatted_citation = format_citation(citation.text);
+      $j('#citation_text_'+cl).html(formatted_citation);        
       $j('#tooltip').text("Done, hit enter for the next one...");
       scroll_preview();
     });
