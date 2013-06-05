@@ -35,7 +35,7 @@ $j(function(){
   }
   
   function update_preview(){
-    $j('#sortable > dl').each(function () {this.style.cssText = 'color: black;'});
+    //$j('#sortable > dl').each(function () {this.style.cssText = 'color: black;'});
     
     input_lines = $j('#citations').val().split('\n');
     for (var i=0;i<input_lines.length;i++){ 
@@ -56,6 +56,7 @@ $j(function(){
 	  if($j('#sortable > dl')[i]){
 	    el = $j('#sortable > dl > dt')[i];
 	    //$j(el).text('Citation #'+cn);
+	    $j(el).text('');
 	    $j(el).append('<hr />');
 	    el = $j('#sortable > dl > dd')[i];
 	    //$j(el).text('Please type eg 4:4 or Gen 1:1...');
@@ -84,7 +85,7 @@ $j(function(){
       i++;
       
     });
-    $j('#x' + current_line()).attr('style','color: black;');
+    //$j('#x' + current_line()).attr('style','color: black;');
     //alert($j('#sortable').html());
 	$j('#rendered_citations').val($j('#sortable').html());
     scroll_preview();
