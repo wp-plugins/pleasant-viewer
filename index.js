@@ -134,10 +134,10 @@ $j(function(){
   
   
   $j("#name").click(function(){
-    if ($j("#name").val() == 'New Inspiration' ) {$j(this).select();}
+    if ($j("#name").val() == title_placeholder ) {$j(this).select();}
   });
   $j("#description").click(function(){
-    if ($j('#description').val() == 'Add an introduction or description for these citations...') {$j(this).select();}
+    if ($j('#description').val() == description_placeholder) {$j(this).select();}
   });
   
   
@@ -153,10 +153,10 @@ $j( document ).ready(function() {
   $j('#citations').focus();
   $j('#citations').val("Gen. 12:1-4 the (to :)");
   if ($j('#name').val().length == 0) {
-    $j('#name').val('New Inspiration');
+    $j('#name').val(title_placeholder);
   }
   if ($j('#description').val().length == 0) {
-    $j('#description').val('Add an introduction or description for these citations...');
+    $j('#description').val(description_placeholder);
   }
   update_preview();
 });

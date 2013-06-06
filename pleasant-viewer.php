@@ -25,6 +25,10 @@ in May of 2013.  Gabriel wrote the plugin, Cameron wrote cskit-rb, and James wro
 */ 
 
 
+// Strings
+$pleasant_viewer_strings['title_placeholder'] = "New Inspiration";
+$pleasant_viewer_strings['description_placeholder'] = "Add an introduction or description for these citations...";
+$default_category_if_exists = "Inspiration";
 
 
 /**
@@ -35,6 +39,7 @@ in May of 2013.  Gabriel wrote the plugin, Cameron wrote cskit-rb, and James wro
  */
 function pleasantviewer_display_entry_form_shortcode($atts = array(), $content = '') {
 
+	global $pleasant_viewer_strings;
 
 // 	extract(shortcode_atts(
 // 		array(
@@ -51,13 +56,14 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 	foreach ($categories as $category) {
 
 		if ($category->name != "News") {
+			// Don't show "News" category in list
 
 			$category_options .= '<option value="' . $category->cat_ID . '"';
 			if (isset($_POST['post_category_id'])) {
 				if ($category->cat_ID == strip_tags(stripslashes($_POST['post_category_id'])) ) {
 					$category_options .= ' selected="selected" ';
 				}
-			} else if ($category->name == "Inspiration" ) {
+			} else if ($category->name == $default_category_if_exists ) {
 				$category_options .= ' selected="selected" ';
 			}
 			$category_options .= '>' . $category->name . '</option>';
@@ -212,9 +218,19 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 					'class' => array()),
 				);
 
+			$post_title = "";
+			if ($pleasant_viewer_strings['title_placeholder'] != strip_tags(stripslashes($_POST['post_topic']))) {
+				$post_title = strip_tags(stripslashes($_POST['post_topic']));
+			}
+
+			$post_introduction = "";
+			if ($pleasant_viewer_strings['description_placeholder'] != strip_tags(stripslashes($_POST['post_introduction']))) {
+				$post_introduction = strip_tags(stripslashes($_POST['post_introduction']));
+			}
+
 			$formatted_post_body = "";
 			$formatted_post_body .= '<div class="pleasant-viewer-post-introduction">' . "\n";
-			$formatted_post_body .= wp_kses($_POST['post_introduction'], $allowed_html) . "\n";
+			$formatted_post_body .= wp_kses($post_introduction, $allowed_html) . "\n";
 			$formatted_post_body .= '</div>' . "\n";
 			$formatted_post_body .= '<div class="pleasant-viewer-citations-formatted">' . "\n";
 			$formatted_post_body .= wp_kses($citations_formatted, $allowed_html);
@@ -236,11 +252,10 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 			else {
 				$post_author = 1;
 				$post_status = 'publish';
-			}
-			
+			}			
 
 			$whq_post_properties = array(
-				'post_title' => strip_tags(stripslashes($_POST['post_topic'])),
+				'post_title' => $post_title,
 				'post_content' => $formatted_post_body,
 				'post_status' => $post_status,
 				'post_author' => $post_author,
@@ -257,7 +272,7 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 			if ( $post_id ) {
 				// Add our custom fields
 				add_post_meta($post_id, 'pleasantviewer_citations_list', strip_tags(stripslashes($_POST['post_citations'])));
-				add_post_meta($post_id, 'pleasantviewer_introduction', strip_tags(stripslashes($_POST['post_introduction'])));
+				add_post_meta($post_id, 'pleasantviewer_introduction', $post_introduction);
 
 				//wp_redirect( get_permalink($post_id) ); exit;
 
@@ -385,7 +400,14 @@ function pleasant_viewer_styles() {
 
 
 function pleasant_viewer_js() {
+	global $pleasant_viewer_strings;
+?>
+	<script type="text/javascript">
+		var title_placeholder = <?php echo json_encode($pleasant_viewer_strings['title_placeholder']); ?>;
+		var description_placeholder = <?php echo json_encode($pleasant_viewer_strings['description_placeholder']); ?>;
+	</script>
 
+<?php
 	wp_enqueue_script('the_js', plugins_url('/index.js',__FILE__) );
 
 }
