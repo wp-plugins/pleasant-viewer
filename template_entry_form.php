@@ -1,6 +1,6 @@
 <div id="takeover">
-	<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="rendered_citations" value="<?php echo strip_tags(stripslashes($_POST['rendered_citations'])); ?>" />
+	<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" id="citation_form" method="post" enctype="multipart/form-data">
+		<input type="hidden" id="rendered_citations" name="rendered_citations" value="<?php echo strip_tags(stripslashes($_POST['rendered_citations'])); ?>" />
 
 		<div style="width: 30%; float: left;">
 			<input type="text" id="name" name="post_topic" size="60" style="width: 80%; margin: 5px;font-size:20px;cursor:pointer;" value="<?php echo strip_tags(stripslashes($_POST['post_topic'])); ?>" /><br>

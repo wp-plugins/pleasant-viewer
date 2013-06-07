@@ -98,8 +98,7 @@ $j(function(){
       
     });
     $j('#x' + current_line()).attr('style','background-color: #eeeeee;-moz-border-radius: 15px;border-radius: 15px;padding-left:8px;');
-    //alert($j('#sortable').html());
-	$j('#rendered_citations').val($j('#sortable').html());
+    //alert($j('#sortable').html());	
     scroll_preview();
   }
   
@@ -140,7 +139,9 @@ $j(function(){
     if ($j('#description').val() == description_placeholder) {$j(this).select();}
   });
   
-  
+  $j('#citation_form').submit(function() {
+    $j('#rendered_citations').val($j('#sortable').html());    
+  });
   
   update_preview();
   //console.log('just loaded citations');
