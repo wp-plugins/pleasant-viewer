@@ -47,7 +47,7 @@ $j(function(){
   }
   
   function update_preview(){
-    //$j('#sortable > dl').each(function () {this.style.cssText = 'color: black;'});
+    $j('#sortable > dl').each(function () {this.style.cssText = 'background-color: #ffffff;-moz-border-radius: 15px;border-radius: 15px;padding-left:8px;'});
     
     input_lines = $j('#citations').val().split('\n');
     for (var i=0;i<input_lines.length;i++){ 
@@ -97,7 +97,7 @@ $j(function(){
       i++;
       
     });
-    //$j('#x' + current_line()).attr('style','color: black;');
+    $j('#x' + current_line()).attr('style','background-color: #eeeeee;-moz-border-radius: 15px;border-radius: 15px;padding-left:8px;');
     //alert($j('#sortable').html());
 	$j('#rendered_citations').val($j('#sortable').html());
     scroll_preview();
@@ -151,7 +151,9 @@ $j(function(){
   
 $j( document ).ready(function() {
   $j('#citations').focus();
-  $j('#citations').val("Gen. 12:1-4 the (to :)");
+  if ($j('#citations').val() == "") {
+    $j('#citations').val("Gen. 12:1-4 the (to :)");
+  }
   if ($j('#name').val().length == 0) {
     $j('#name').val(title_placeholder);
   }

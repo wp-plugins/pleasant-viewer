@@ -19,7 +19,7 @@
 
 		<div style="width: 70%; float: right; margin-top: 30px;">    
 			<strong>Preview</strong><br />
-			<div id="sortable" style="height: 500px;overflow: auto; border: 1px solid #eee;"></div>		
+			<div id="sortable" style="height: 500px;overflow: auto; border: 1px solid #eee;" contenteditable="true"></div>		
 		</div>
 
 	</form>
