@@ -39,7 +39,7 @@ $default_category_if_exists = "Inspiration";
  */
 function pleasantviewer_display_entry_form_shortcode($atts = array(), $content = '') {
 
-	global $pleasant_viewer_strings;
+	global $pleasant_viewer_strings, $default_category_if_exists;
 
 // 	extract(shortcode_atts(
 // 		array(
@@ -111,80 +111,10 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 
 		} else {
 		
-			if ($_POST['rendered_citations'] == "") {
-
-				// We didn't get text in form, supplied by Javascript.  Use built-in PHP library
-				// to call to the API
-
-				$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
-				$citation_list_array = explode ("\n", $citation_list_raw);
-
-				$post_category = strip_tags(stripslashes($_POST['post_category_id']));
-
-				// jSON URL which should be requested
-				$json_url = 'http://cskit-server.herokuapp.com/v1/text.json';
-
-				$citation_list_retrieved = array();
-				$citations_formatted = "";
-				$readings = "";
-
-				foreach ($citation_list_array as $citation) {
-
-					if ($citation != "") {
-
-						$volume = 'bible_kjv';
-						if (is_numeric(substr($citation, 0, 1))) {
-							$volume = 'science_health';
-						}
-
-						$readings .= $volume . " " . $citation . "|";
-
-					}
-				}
-
-				$json_string = 'citations='. urlencode($readings) . '&format=plain_text';
-				$curlopt_url = $json_url . '?' .  $json_string;
-				$theBody = wp_remote_retrieve_body( wp_remote_get($curlopt_url) );
-				$body = json_decode($theBody, true);
-
-				foreach ($body as $citation) {
-
-					$citation_list_retrieved[] = array(
-
-						'citation' => $citation["citation"],
-						'volume' => $volume,
-						'text' => $citation["text"],
-						'api_url' => $curlopt_url
-		
-						);
-
-				}
-
-				$have_citation_text = false;
-
-				foreach ($citation_list_retrieved as $passage) {
-					if ($passage['text'] != "") {
-						$citations_formatted .= '<dl>';
-						$citations_formatted .= '<dt>';
-						if ($passage['volume'] == 'science_health') {
-							$citations_formatted .= 'SH ';
-						}
-						$citations_formatted .= $passage['citation'] . '</dt>';
-						$citations_formatted .= '<dd>';
-						$citations_formatted .= nl2br($passage['text']);
-						//$citations_formatted .= "<br />" . $passage['api_url'];
-						$citations_formatted .= '</dd></dl>' . "\n\n";
-						$have_citation_text = true;
-					}
-				}
-
-			}
-			else {
-				// Javascript library provided rendered text, don't need to call API via PHP
-				$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
-				$citations_formatted = $_POST['rendered_citations'];
-				$have_citation_text = true;				
-			}
+			// Javascript library provided rendered text, don't need to call API via PHP
+			$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
+			$citations_formatted = $_POST['rendered_citations'];
+			$have_citation_text = true;	
 
 			$allowed_html = array(
 				'a' => array(
@@ -294,6 +224,68 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 // Register shortcode
 add_shortcode('pleasantviewer', 'pleasantviewer_display_entry_form_shortcode');
 
+/**
+ * Function to retrieve citations using PHP only (no javascript).  Keeping it here for
+ * reference and possible use in the future, but javascript interface is preferred.
+ */
+function get_citations_no_js() {
+
+	$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
+	$citation_list_array = explode ("\n", $citation_list_raw);
+
+	$post_category = strip_tags(stripslashes($_POST['post_category_id']));
+
+	// jSON URL which should be requested
+	$json_url = 'http://cskit-server.herokuapp.com/v1/text.json';
+
+	$citation_list_retrieved = array();
+	$citations_formatted = "";
+	$readings = "";
+
+	foreach ($citation_list_array as $citation) {
+		if ($citation != "") {
+			$volume = 'bible_kjv';
+			if (is_numeric(substr($citation, 0, 1))) {
+				$volume = 'science_health';
+			}
+			$readings .= $volume . " " . $citation . "|";
+		}
+	}
+
+	$json_string = 'citations='. urlencode($readings) . '&format=plain_text';
+	$curlopt_url = $json_url . '?' .  $json_string;
+	$theBody = wp_remote_retrieve_body( wp_remote_get($curlopt_url) );
+	$body = json_decode($theBody, true);
+
+	foreach ($body as $citation) {
+		$citation_list_retrieved[] = array(
+			'citation' => $citation["citation"],
+			'volume' => $volume,
+			'text' => $citation["text"],
+			'api_url' => $curlopt_url
+			);
+	}
+
+	foreach ($citation_list_retrieved as $passage) {
+		if ($passage['text'] != "") {
+			$citations_formatted .= '<dl>';
+			$citations_formatted .= '<dt>';
+			if ($passage['volume'] == 'science_health') {
+				$citations_formatted .= 'SH ';
+			}
+			$citations_formatted .= $passage['citation'] . '</dt>';
+			$citations_formatted .= '<dd>';
+			$citations_formatted .= nl2br($passage['text']);
+			//$citations_formatted .= "<br />" . $passage['api_url'];
+			$citations_formatted .= '</dd></dl>' . "\n\n";
+		}
+	}
+	
+	return $citations_formatted;
+
+}
+
+
 
 add_action('admin_menu', 'plugin_admin_add_page');
 
@@ -393,7 +385,6 @@ function pleasant_viewer_styles() {
 <!--<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>-->
 <!--<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>-->
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 
 	<?php
 }
