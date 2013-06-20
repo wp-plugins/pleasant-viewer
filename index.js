@@ -1,14 +1,36 @@
 $j=jQuery.noConflict();
 $j(function(){
+  function detect_book(citation_string){
+    var splitcitations;
+    var book;
+    var citation;
+    var api_string;
+    
+    splitcitations = citation_string.split(" ");
+    console.log(splitcitations);
+    book = splitcitations[0];
+    citation = splitcitations.slice(1,splitcitations.size).join(' ');
+    console.log(book);
+    console.log(citation);
+    if (book.indexOf(':') == -1){
+      if (book == "KJV") {api_string = 'bible ' + citation}
+      else if (book == "YLT") {api_string = 'yltbible ' + citation}
+      else if (book == "SH") {api_string = 'science_health ' + citation}	
+      else {api_string = 'bible ' + citation_string; book = "KJV"; citation = citation_string;}
+      }
+    else {
+      api_string = 'science_health ' + citation_string;
+      book = "S&H";      
+      citation = citation_string;
+    }
+    return { book: book, citation: citation, api_string: api_string }
+  }
   function Citation(citation){
     that = this;
     this.ready = function(cb){
-      if (!isNaN(citation.charAt(0))) {
-	citation = 'science_health ' + citation	
-      }
-      else {
-	citation = 'bible ' + citation	
-      }
+      
+      citation = detect_book(citation).api_string;                  
+      
       $j.getJSON(
         that.url = "http://cskit-server.herokuapp.com/v1/text.json?"
         + "callback=?&citations=" + citation
@@ -106,21 +128,20 @@ $j(function(){
     $j('#tooltip').text("Looking up citations...");    
     //console.log(current_line());        
     cit = $j('#citations').val().split('\n')[cl];
-      if (!isNaN(cit.charAt(0))) {
-	$j('#detected_book').text('  Book: S&H');    
-      }
-      else {
-	$j('#detected_book').text('  Book: KJV');    
-      }	            
-    cit = $j('#citations').val().split('\n')[cl];
-    //console.log($j('#citations').val().split('\n')[0]);
+    
+    $j('#detected_book').text('  Book: ' + detect_book(cit).book);    
+          
     citation = new Citation(cit);
+  console.log(citation);  
     citation.ready(function(){  
-      if (!isNaN(citation.citation.charAt(0))) {
-	citation.citation = 'S&H ' + citation.citation
-      }
+
+	citation.citation = detect_book(cit).book + ' ' + citation.citation
+
+  console.log(citation);
+  console.log(citation.citation);
+  console.log(citation.text);
       $j('#citation_citation_'+cl).text(citation.citation);
-      formatted_citation = format_citation(citation.text);
+     formatted_citation = format_citation(citation.text);
       $j('#citation_text_'+cl).html(formatted_citation);        
       $j('#tooltip').text("Done, hit enter for the next one...");
       scroll_preview();
