@@ -152,7 +152,7 @@ $j(function(){
 $j( document ).ready(function() {
   $j('#citations').focus();
   if ($j('#citations').val() == "") {
-    $j('#citations').val("Gen. 12:1-4 the (to :)");
+    $j('#citations').val("Mat 10:8 freely");
   }
   if ($j('#name').val().length == 0) {
     $j('#name').val(title_placeholder);
