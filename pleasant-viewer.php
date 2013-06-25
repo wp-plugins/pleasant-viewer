@@ -158,6 +158,8 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 				$post_introduction = strip_tags(stripslashes($_POST['post_introduction']));
 			}
 
+			$post_category = strip_tags(stripslashes($_POST['post_category_id']));
+
 			$formatted_post_body = "";
 			$formatted_post_body .= '<div class="pleasant-viewer-post-introduction">' . "\n";
 			$formatted_post_body .= wp_kses($post_introduction, $allowed_html) . "\n";
