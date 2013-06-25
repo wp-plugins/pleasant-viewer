@@ -383,7 +383,6 @@ function pleasant_viewer_styles() {
 </style>
 
 <!--<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>-->
-<script src="http://pleasantviewer.org/wp-includes/js/jquery/jquery.js?ver=1.8.3"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
 	<?php
@@ -399,7 +398,9 @@ function pleasant_viewer_js() {
 	</script>
 
 <?php
+
 	wp_enqueue_script('the_js', plugins_url('/index.js',__FILE__) );
+	wp_enqueue_script('jquery');
 
 }
 
