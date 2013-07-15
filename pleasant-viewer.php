@@ -72,7 +72,6 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 
 	}
 
-	// Set some functions
 	$message = array();
 
 	//Build the form
@@ -114,7 +113,7 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 			// Javascript library provided rendered text, don't need to call API via PHP
 			$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
 			$citations_formatted = $_POST['rendered_citations'];
-			$have_citation_text = true;	
+			$have_citation_text = is_valid_citation();
 
 			$allowed_html = array(
 				'a' => array(
@@ -225,6 +224,60 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 
 // Register shortcode
 add_shortcode('pleasantviewer', 'pleasantviewer_display_entry_form_shortcode');
+
+/**
+ * Does a basic CAPTCHA / check that at least one proper citation was returned from the API
+ * Duplicates lookup done in JS, until we have a better way of weeding out spam submissions
+ */
+function is_valid_citation() {
+
+	$valid_citation = false;
+
+	$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
+	$citation_list_array = explode ("\n", $citation_list_raw);
+
+	// jSON URL which should be requested
+	$json_url = 'http://cskit-server.herokuapp.com/v1/text.json';
+
+	$citation_list_retrieved = array();
+	$citations_formatted = "";
+	$readings = "";
+
+	foreach ($citation_list_array as $citation) {
+		if ($citation != "") {
+			$volume = 'bible_kjv';
+			if (is_numeric(substr($citation, 0, 1))) {
+				$volume = 'science_health';
+			}
+			$readings .= $volume . " " . $citation . "|";
+		}
+	}
+
+	$json_string = 'citations='. urlencode($readings) . '&format=plain_text';
+	$curlopt_url = $json_url . '?' .  $json_string;
+	$theBody = wp_remote_retrieve_body( wp_remote_get($curlopt_url) );
+	$body = json_decode($theBody, true);
+
+	foreach ($body as $citation) {
+		if (isset($citation["citation"]) && isset($citation["text"])) {
+			$citation_list_retrieved[] = array(
+				'citation' => $citation["citation"],
+				'volume' => $volume,
+				'text' => $citation["text"],
+				'api_url' => $curlopt_url
+				);
+		}
+	}
+
+	// If we get at least one valid text back, pass validation
+	foreach ($citation_list_retrieved as $passage) {
+		if ($passage['text'] != "") {
+			$valid_citation = true;
+		}
+	}
+	
+	return $valid_citation;
+}
 
 /**
  * Function to retrieve citations using PHP only (no javascript).  Keeping it here for
