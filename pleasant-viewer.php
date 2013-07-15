@@ -109,110 +109,118 @@ function pleasantviewer_display_entry_form_shortcode($atts = array(), $content =
 			return $whq_form;
 
 		} else {
-		
-			// Javascript library provided rendered text, don't need to call API via PHP
-			$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
-			$citations_formatted = $_POST['rendered_citations'];
-			$have_citation_text = is_valid_citation();
 
-			$allowed_html = array(
-				'a' => array(
-					'href' => array(),
-					'title' => array()
-				),
-				'br' => array(),
-				'em' => array(),
-				'strong' => array(),
-				'hr' => array(),
-				'span' => array(
-					'style' => array(),
-					'class' => array(),
-					'id' => array()),
-				'div' => array(
-					'style' => array(),
-					'class' => array(),
-					'id' => array()),
-				'p' => array(
-					'style' => array(),
-					'class' => array(),
-					'id' => array()),
-				'dl' => array(
-					'id' => array(),
-					'class' => array()),
-				'dt' => array(
-					'id' => array(),
-					'class' => array()),
-				'dd' => array(
-					'id' => array(),
-					'class' => array()),
-				);
+			if (is_valid_citation()) {
 
-			$post_title = "";
-			if ($pleasant_viewer_strings['title_placeholder'] != strip_tags(stripslashes($_POST['post_topic']))) {
-				$post_title = strip_tags(stripslashes($_POST['post_topic']));
-			}
+				// If we're valid, publish new post
 
-			$post_introduction = "";
-			if ($pleasant_viewer_strings['description_placeholder'] != strip_tags(stripslashes($_POST['post_introduction']))) {
-				$post_introduction = strip_tags(stripslashes($_POST['post_introduction']));
-			}
+				$citation_list_raw = strip_tags(stripslashes($_POST['post_citations']));
+				$citations_formatted = $_POST['rendered_citations'];
 
-			$post_category = strip_tags(stripslashes($_POST['post_category_id']));
+				$allowed_html = array(
+					'a' => array(
+						'href' => array(),
+						'title' => array()
+					),
+					'br' => array(),
+					'em' => array(),
+					'strong' => array(),
+					'hr' => array(),
+					'span' => array(
+						'style' => array(),
+						'class' => array(),
+						'id' => array()),
+					'div' => array(
+						'style' => array(),
+						'class' => array(),
+						'id' => array()),
+					'p' => array(
+						'style' => array(),
+						'class' => array(),
+						'id' => array()),
+					'dl' => array(
+						'id' => array(),
+						'class' => array()),
+					'dt' => array(
+						'id' => array(),
+						'class' => array()),
+					'dd' => array(
+						'id' => array(),
+						'class' => array()),
+					);
 
-			$formatted_post_body = "";
-			$formatted_post_body .= '<div class="pleasant-viewer-post-introduction">' . "\n";
-			$formatted_post_body .= wp_kses($post_introduction, $allowed_html) . "\n";
-			$formatted_post_body .= '</div>' . "\n";
-			$formatted_post_body .= '<div class="pleasant-viewer-citations-formatted">' . "\n";
-			$formatted_post_body .= wp_kses($citations_formatted, $allowed_html);
-			$formatted_post_body .= '</div>' . "\n";
-			$formatted_post_body .= '<div class="pleasant-viewer-citations-list">' . "\n";
-			$formatted_post_body .= wp_kses($citation_list_raw, $allowed_html) . "\n";
-			$formatted_post_body .= '</div>';
+				$post_title = "";
+				if ($pleasant_viewer_strings['title_placeholder'] != strip_tags(stripslashes($_POST['post_topic']))) {
+					$post_title = strip_tags(stripslashes($_POST['post_topic']));
+				}
 
-			$options = get_option('pleasant_viewer_plugin_options');
+				$post_introduction = "";
+				if ($pleasant_viewer_strings['description_placeholder'] != strip_tags(stripslashes($_POST['post_introduction']))) {
+					$post_introduction = strip_tags(stripslashes($_POST['post_introduction']));
+				}
+
+				$post_category = strip_tags(stripslashes($_POST['post_category_id']));
+
+				// Formatted text to insert into the post body itself
+				$formatted_post_body = "";
+				$formatted_post_body .= '<div class="pleasant-viewer-post-introduction">' . "\n";
+				$formatted_post_body .= wp_kses($post_introduction, $allowed_html) . "\n";
+				$formatted_post_body .= '</div>' . "\n";
+				$formatted_post_body .= '<div class="pleasant-viewer-citations-formatted">' . "\n";
+				$formatted_post_body .= wp_kses($citations_formatted, $allowed_html);
+				$formatted_post_body .= '</div>' . "\n";
+				$formatted_post_body .= '<div class="pleasant-viewer-citations-list">' . "\n";
+				$formatted_post_body .= wp_kses($citation_list_raw, $allowed_html) . "\n";
+				$formatted_post_body .= '</div>';
+
+				$options = get_option('pleasant_viewer_plugin_options');
 
 
-			if (is_user_logged_in() && current_user_can("publish_posts")) {
-				$post_status = 'publish';
-			}
-			else if ($options['pleasant_viewer_plugin_anonymous_user_id'] != "") {
-				$post_author = $options['pleasant_viewer_plugin_anonymous_user_id'];
-				$post_status = 'publish';
+				if (is_user_logged_in() && current_user_can("publish_posts")) {
+					$post_status = 'publish';
+				}
+				else if ($options['pleasant_viewer_plugin_anonymous_user_id'] != "") {
+					$post_author = $options['pleasant_viewer_plugin_anonymous_user_id'];
+					$post_status = 'publish';
+				}
+				else {
+					$post_author = 1;
+					$post_status = 'publish';
+				}			
+
+				$whq_post_properties = array(
+					'post_title' => $post_title,
+					'post_content' => $formatted_post_body,
+					'post_status' => $post_status,
+					'post_author' => $post_author,
+					'post_category' => array($post_category)
+					);
+
+				$post_id = wp_insert_post( $whq_post_properties );
+
+				if ( $post_id ) {
+					// Add our custom fields
+					add_post_meta($post_id, 'pleasantviewer_citations_list', strip_tags(stripslashes($_POST['post_citations'])));
+					add_post_meta($post_id, 'pleasantviewer_introduction', $post_introduction);
+
+					//wp_redirect( get_permalink($post_id) ); exit;
+
+					echo '<p>Thank you for your submission.</p>';
+				
+					echo '<a href="' . get_permalink($post_id) . '">Click here to view and share this with others</a>';
+				
+					$hide_form = true;
+				}
+
+
 			}
 			else {
-				$post_author = 1;
-				$post_status = 'publish';
-			}			
 
-			$whq_post_properties = array(
-				'post_title' => $post_title,
-				'post_content' => $formatted_post_body,
-				'post_status' => $post_status,
-				'post_author' => $post_author,
-				'post_category' => array($post_category)
-				);
-
-			if (!$have_citation_text) {
 				echo "<span style='color: #f00;'><strong>NOTE: Please supply at least one valid citation.</strong></span>";
-				return $whq_form;		
+				return $whq_form;
+
 			}
 
-			$post_id = wp_insert_post( $whq_post_properties );
-
-			if ( $post_id ) {
-				// Add our custom fields
-				add_post_meta($post_id, 'pleasantviewer_citations_list', strip_tags(stripslashes($_POST['post_citations'])));
-				add_post_meta($post_id, 'pleasantviewer_introduction', $post_introduction);
-
-				//wp_redirect( get_permalink($post_id) ); exit;
-
-				echo '<p>Thank you for your submission.</p>';
-				
-				echo '<a href="' . get_permalink($post_id) . '">Click here to view and share this with others</a>';
-				
-				$hide_form = true;
-			}
 		}
 	}
   
@@ -258,22 +266,28 @@ function is_valid_citation() {
 	$theBody = wp_remote_retrieve_body( wp_remote_get($curlopt_url) );
 	$body = json_decode($theBody, true);
 
-	foreach ($body as $citation) {
-		if (isset($citation["citation"]) && isset($citation["text"])) {
-			$citation_list_retrieved[] = array(
-				'citation' => $citation["citation"],
-				'volume' => $volume,
-				'text' => $citation["text"],
-				'api_url' => $curlopt_url
-				);
-		}
-	}
+	if (!isset($body["error"])) {
 
-	// If we get at least one valid text back, pass validation
-	foreach ($citation_list_retrieved as $passage) {
-		if ($passage['text'] != "") {
-			$valid_citation = true;
+		foreach ($body as $citation) {
+			if (isset($citation["citation"]) && isset($citation["text"])) {
+				$citation_list_retrieved[] = array(
+					'citation' => $citation["citation"],
+					'volume' => $volume,
+					'text' => $citation["text"],
+					'api_url' => $curlopt_url
+					);
+			}
 		}
+
+		// If we get at least one valid text back, pass validation
+		if (count($citation_list_retrieved) > 0) {
+			foreach ($citation_list_retrieved as $passage) {
+				if ($passage['text'] != "") {
+					$valid_citation = true;
+				}
+			}
+		}
+
 	}
 	
 	return $valid_citation;
