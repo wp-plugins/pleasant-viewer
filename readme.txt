@@ -3,7 +3,7 @@ Contributors: gserafini
 Donate link: http://bit.ly/cs-bible-lesson-plugin-donation
 Tags: bible, lesson, viewer, citations, science-and-health, christian-science
 Requires at least: 3.5
-Tested up to: 3.9
+Tested up to: 4.2
 Stable tag: 1.0
 
 Easily share Wednesday Readings, inspiring texts, lessons, benedictions and more on your WordPress site. Official site: PleasantViewer.org
